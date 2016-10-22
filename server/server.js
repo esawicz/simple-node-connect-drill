@@ -5,22 +5,31 @@ var session = require('express-session');
 var chatCtrl = require('./controllers/chatCtrl');
 var port = 3737;
 
-// TODO server front end files with static
+app.use(express.static('public')); //always where the index.html is usually includes dirname
 
 app.use(bodyParser.json());
 
-// TODO Initialize Session
+
+app.use(session({secret: 'keyboard cat'}))
 
 app.post("/api/screenname", function(req, res){
-  // TODO Save screenname to session
+  session.screenname = req.body.screenname;
+  res.status(200).send('screenname saved');
 })
 
 app.get("/api/chats", chatCtrl.getChats);
-app.post("/api/chats", chatCtrl.postChats);
+app.post("/api/chats", addScreenname, chatCtrl.postChats);
 app.delete("/api/chats", chatCtrl.deleteChats);
 
 
 
 app.listen(port, function(){
-  console.log("Listeing on port ", port, " INSERT-WITTY-STATEMENT-HERE");
+  console.log("Listening on port ", port, " INSERT-WITTY-STATEMENT-HERE");
 });
+
+
+function addScreenname(req, res, next) {
+	console.log(8888888888, session);
+	req.body.screenname = session.screenname;
+	next();
+}
